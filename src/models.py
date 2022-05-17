@@ -9,40 +9,57 @@ from eralchemy import render_er
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'User'
+    __tablename__ = 'user'
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
     username = Column(String(250), nullable=False)
     first_name = Column(String(250), nullable=False)
     last_name = Column(String(250), nullable=False)
-    email = Column(String(250), nullable=False)
+    email = Column(String(250), unique=True, nullable=False)
 
 
 class Follower(Base):
-    __tablename__ = 'Follower'
+    __tablename__ = 'follower'
+    id = Column(Integer, primary_key=True)
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
-    user_from_id = Column(Integer, primary_key=True)
-    user_to_id = Column(Integer, primary_key=True)
+    user_from_id = Column(Integer, ForeignKey("user.id"))
+    user_to_id = Column(Integer, ForeignKey("user.id"))
+    user =  relationship("User")
+
 
 class Post(Base):
-    __tablename__ = 'person'
+    __tablename__ = 'post'
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship("User")
+
+
+class Media(Base):
+    __tablename__ = 'media'
+    # Here we define columns for the table person
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    url = Column(String(250), nullable=False)
+    post_id = Column(Integer, ForeignKey("post.id"))
+    post =  relationship("Post")
+
+
 
 class Comment(Base):
-    __tablename__ = 'address'
+    __tablename__ = 'comment'
     # Here we define columns for the table address.
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
     comment_text = Column(String(250))
-    street_number = Column(String(250))
-    author_id = Column(Integer, ForeignKey('person.id'))
-    post_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    author_id = Column(Integer, ForeignKey('user.id'))
+    post_id = Column(Integer, ForeignKey('post.id'))
+    user =  relationship("User")
+    post =  relationship("Post")
+
 
     def to_dict(self):
         return {}
