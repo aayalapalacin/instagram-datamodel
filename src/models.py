@@ -17,6 +17,8 @@ class User(Base):
     first_name = Column(String(250), nullable=False)
     last_name = Column(String(250), nullable=False)
     email = Column(String(250), unique=True, nullable=False)
+    post = relationship("Post",backref="user", lazy=True)
+    follower = relationship("Follower",backref="user", lazy=True)
 
 
 class Follower(Base):
@@ -26,7 +28,7 @@ class Follower(Base):
     # Notice that each column is also a normal Python instance attribute.
     user_from_id = Column(Integer, ForeignKey("user.id"))
     user_to_id = Column(Integer, ForeignKey("user.id"))
-    user =  relationship("User")
+    user =  relationship("User",backref='follower', lazy=True)
 
 
 class Post(Base):
@@ -35,7 +37,7 @@ class Post(Base):
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("user.id"))
-    user = relationship("User")
+    user = relationship("User",backref='post', lazy=True)
 
 
 class Media(Base):
@@ -45,7 +47,7 @@ class Media(Base):
     id = Column(Integer, primary_key=True)
     url = Column(String(250), nullable=False)
     post_id = Column(Integer, ForeignKey("post.id"))
-    post =  relationship("Post")
+    post =  relationship("Post",backref='media', lazy=True)
 
 
 
@@ -57,8 +59,8 @@ class Comment(Base):
     comment_text = Column(String(250))
     author_id = Column(Integer, ForeignKey('user.id'))
     post_id = Column(Integer, ForeignKey('post.id'))
-    user =  relationship("User")
-    post =  relationship("Post")
+    user =  relationship("User",backref='comment', lazy=True)
+    post =  relationship("Post",backref='comment', lazy=True)
 
 
     def to_dict(self):
